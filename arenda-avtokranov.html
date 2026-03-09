@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Аренда автокранов</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --yellow: #F5A623;
+    --yellow-dark: #e09415;
+    --black: #111111;
+    --dark: #1a1a1a;
+    --gray-bg: #f5f5f5;
+    --text: #333333;
+    --text-light: #666666;
+    --border: #e0e0e0;
+    --white: #ffffff;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* NAVBAR */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: var(--white);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--black);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--yellow); }
+
+  .btn-primary {
+    background: var(--yellow);
+    color: var(--white);
+    border: none;
+    padding: 12px 28px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover { background: var(--yellow-dark); transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid var(--white);
+    padding: 12px 28px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+  }
+
+  .btn-outline:hover { background: rgba(255,255,255,0.15); }
+
+  /* HERO */
+  #hero {
+    margin-top: 70px;
+    position: relative;
+    height: 580px;
+    background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.5)),
+      url('https://cdn.b12.io/client_media/4LsxPdfZ/fe197ac6-1b08-11f1-9a40-0242ac110002-AFw0d63NwrcHrjUka2aTj.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    padding: 0 60px;
+  }
+
+  .hero-content h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--yellow);
+    margin-bottom: 12px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .hero-content p {
+    font-size: 20px;
+    color: var(--white);
+    margin-bottom: 32px;
+  }
+
+  .hero-btns { display: flex; gap: 16px; }
+
+  /* SECTIONS COMMON */
+  section { padding: 80px 60px; }
+
+  .section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    text-align: center;
+    color: var(--black);
+    margin-bottom: 10px;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 15px;
+    margin-bottom: 48px;
+  }
+
+  /* CRANES / PARK */
+  #park { background: var(--white); }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .crane-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .crane-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); transform: translateY(-3px); }
+
+  .crane-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+  }
+
+  .crane-card-body { padding: 24px; }
+
+  .crane-card-body h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .crane-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .spec-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .spec-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--black);
+  }
+
+  .crane-card-body p {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .btn-full {
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  /* PRICING */
+  #pricing { background: var(--gray-bg); }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .price-card {
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 32px;
+    transition: box-shadow 0.2s;
+  }
+
+  .price-card.featured {
+    border-color: var(--yellow);
+    box-shadow: 0 4px 20px rgba(245,166,35,0.2);
+  }
+
+  .price-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .price-card .capacity {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .price-row:last-of-type { border-bottom: none; margin-bottom: 20px; }
+
+  .price-amount {
+    font-weight: 700;
+    color: var(--black);
+  }
+
+  /* CONDITIONS */
+  .conditions-box {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 36px 40px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    text-align: center;
+  }
+
+  .condition-item .label {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+  }
+
+  .condition-item .value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--black);
+  }
+
+  /* ADVANTAGES */
+  #advantages { background: var(--white); }
+
+  .advantages-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    text-align: center;
+  }
+
+  .advantage-item { }
+
+  .advantage-icon {
+    width: 72px;
+    height: 72px;
+    background: #fdf3e0;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 28px;
+  }
+
+  .advantage-item h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .advantage-item p {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.5;
+  }
+
+  /* OBJECTS */
+  #objects { background: var(--gray-bg); }
+
+  .objects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .object-card {
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: box-shadow 0.2s;
+  }
+
+  .object-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+
+  .object-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .object-card-body { padding: 24px; }
+
+  .object-card-body h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .object-card-body p {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .used-crane-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--yellow);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .used-crane-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--black);
+  }
+
+  /* CONTACTS */
+  #contacts { background: var(--white); }
+
+  .contacts-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .contact-info h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    margin-top: 24px;
+  }
+
+  .contact-info h3:first-child { margin-top: 0; }
+
+  .contact-info a, .contact-info p {
+    font-size: 15px;
+    color: var(--yellow);
+    text-decoration: none;
+  }
+
+  .contact-info .addr {
+    color: var(--text);
+  }
+
+  .contact-info .hours {
+    color: var(--text);
+  }
+
+  .emergency {
+    color: var(--yellow) !important;
+    font-weight: 600;
+  }
+
+  .contact-form { }
+
+  .form-group { margin-bottom: 16px; }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--white);
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus { border-color: var(--yellow); }
+
+  .form-group textarea {
+    height: 120px;
+    resize: vertical;
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: #aaa; }
+
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .required { color: #e74c3c; }
+
+  /* FOOTER */
+  footer {
+    background: var(--dark);
+    color: var(--white);
+    padding: 60px 60px 0;
+  }
+
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .footer-brand h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .footer-brand p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.7;
+  }
+
+  .footer-col h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .footer-col p, .footer-col a {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 8px;
+    line-height: 1.6;
+  }
+
+  .footer-col a:hover { color: var(--yellow); }
+
+  .footer-col strong {
+    font-weight: 600;
+    color: var(--white);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .footer-bottom {
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .footer-bottom a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    display: block;
+    margin-top: 6px;
+  }
+
+  .footer-bottom a:hover { color: rgba(255,255,255,0.7); }
+
+  .built-by {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .built-by span { font-weight: 700; color: rgba(255,255,255,0.6); }
+
+  /* Burger (mobile hint) */
+  .burger { display: none; }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .burger { display: block; font-size: 24px; cursor: pointer; background: none; border: none; }
+    section { padding: 60px 20px; }
+    #hero { padding: 0 24px; }
+    .hero-content h1 { font-size: 32px; }
+    .cards-grid, .pricing-grid, .objects-grid, .advantages-grid { grid-template-columns: 1fr; }
+    .contacts-inner { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; }
+    .conditions-box { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="#hero" class="nav-logo">Аренда автокранов</a>
+  <ul class="nav-links">
+    <li><a href="#park">Парк техники</a></li>
+    <li><a href="#pricing">Условия</a></li>
+    <li><a href="#advantages">Преимущества</a></li>
+    <li><a href="#objects">Объекты</a></li>
+    <li><a href="#contacts">Контакты</a></li>
+  </ul>
+  <a href="#contacts" class="btn-primary">Заказать автокран</a>
+  <button class="burger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-content">
+    <h1>Аренда автокранов</h1>
+    <p>Оперативная подача автокрана на ваш объект</p>
+    <div class="hero-btns">
+      <a href="#contacts" class="btn-primary">Заказать сейчас</a>
+      <a href="#park" class="btn-outline">Смотреть парк техники</a>
+    </div>
+  </div>
+</section>
+
+<!-- PARK -->
+<section id="park">
+  <h2 class="section-title">Наши автокраны</h2>
+  <p class="section-subtitle">Полный парк современного оборудования для решения задач любой сложности</p>
+  <div class="cards-grid">
+    <!-- МКС-65 -->
+    <div class="crane-card">
+      <img src="https://cdn.b12.io/client_media/4LsxPdfZ/ff296781-1b08-11f1-82ad-0242ac110002-Ybm2wezQkI5_8aD4tnypD.jpg" alt="МКС-65">
+      <div class="crane-card-body">
+        <h3>МКС-65 (65 тонн)</h3>
+        <div class="crane-specs">
+          <div>
+            <div class="spec-label">Грузоподъёмность</div>
+            <div class="spec-value">65 т</div>
+          </div>
+          <div>
+            <div class="spec-label">Вылет стрелы</div>
+            <div class="spec-value">47 м</div>
+          </div>
+        </div>
+        <p>Универсальный мобильный кран для строительных работ средней сложности. Идеален для монтажа конструкций и оборудования на объектах высотой до 30 этажей.</p>
+        <a href="#contacts" class="btn-primary btn-full">Оставить заявку на этот кран</a>
+      </div>
+    </div>
+    <!-- МКС-100 -->
+    <div class="crane-card">
+      <img src="https://cdn.b12.io/client_media/4LsxPdfZ/fdda3878-1b08-11f1-8bc5-0242ac110002-yy78bqqcwxrk2Dzyv4_8F.jpg" alt="МКС-100">
+      <div class="crane-card-body">
+        <h3>МКС-100 (100 тонн)</h3>
+        <div class="crane-specs">
+          <div>
+            <div class="spec-label">Грузоподъёмность</div>
+            <div class="spec-value">100 т</div>
+          </div>
+          <div>
+            <div class="spec-label">Вылет стрелы</div>
+            <div class="spec-value">55 м</div>
+          </div>
+        </div>
+        <p>Высокопроизводительный кран для комплексных строительных проектов. Оптимален для монтажа тяжёлого оборудования и металлических конструкций.</p>
+        <a href="#contacts" class="btn-primary btn-full">Оставить заявку на этот кран</a>
+      </div>
+    </div>
+    <!-- МКС-160 -->
+    <div class="crane-card">
+      <img src="https://cdn.b12.io/client_media/4LsxPdfZ/fe49b9f5-1b08-11f1-be6d-0242ac110002-d2_mDOZU3axog4eZYt35G.jpg" alt="МКС-160">
+      <div class="crane-card-body">
+        <h3>МКС-160 (160 тонн)</h3>
+        <div class="crane-specs">
+          <div>
+            <div class="spec-label">Грузоподъёмность</div>
+            <div class="spec-value">160 т</div>
+          </div>
+          <div>
+            <div class="spec-label">Вылет стрелы</div>
+            <div class="spec-value">62 м</div>
+          </div>
+        </div>
+        <p>Мощный кран для сложных объектов с требованиями к грузоподъёмности. Обеспечивает максимальную надёжность и производительность.</p>
+        <a href="#contacts" class="btn-primary btn-full">Оставить заявку на этот кран</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <h2 class="section-title">Условия аренды и цены</h2>
+  <p class="section-subtitle">Гибкие условия аренды с возможностью договорного обслуживания</p>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <h3>МКС-65</h3>
+      <p class="capacity">Грузоподъёмность 65 тонн</p>
+      <div class="price-row"><span>За час</span><span class="price-amount">от 3 500 ₽</span></div>
+      <div class="price-row"><span>За смену (8 ч)</span><span class="price-amount">от 25 000 ₽</span></div>
+      <div class="price-row"><span>За сутки</span><span class="price-amount">от 35 000 ₽</span></div>
+      <a href="#contacts" class="btn-primary btn-full">Заказать</a>
+    </div>
+    <div class="price-card featured">
+      <h3>МКС-100</h3>
+      <p class="capacity">Грузоподъёмность 100 тонн</p>
+      <div class="price-row"><span>За час</span><span class="price-amount">от 4 500 ₽</span></div>
+      <div class="price-row"><span>За смену (8 ч)</span><span class="price-amount">от 35 000 ₽</span></div>
+      <div class="price-row"><span>За сутки</span><span class="price-amount">от 48 000 ₽</span></div>
+      <a href="#contacts" class="btn-primary btn-full">Заказать</a>
+    </div>
+    <div class="price-card">
+      <h3>МКС-160</h3>
+      <p class="capacity">Грузоподъёмность 160 тонн</p>
+      <div class="price-row"><span>За час</span><span class="price-amount">от 6 500 ₽</span></div>
+      <div class="price-row"><span>За смену (8 ч)</span><span class="price-amount">от 48 000 ₽</span></div>
+      <div class="price-row"><span>За сутки</span><span class="price-amount">от 65 000 ₽</span></div>
+      <a href="#contacts" class="btn-primary btn-full">Заказать</a>
+    </div>
+  </div>
+  <div class="conditions-box">
+    <div class="condition-item">
+      <div class="label">Минимальный заказ</div>
+      <div class="value">2 часа</div>
+    </div>
+    <div class="condition-item">
+      <div class="label">Работа по договору</div>
+      <div class="value">Да</div>
+    </div>
+    <div class="condition-item">
+      <div class="label">Безналичный расчёт</div>
+      <div class="value">Да</div>
+    </div>
+    <div class="condition-item">
+      <div class="label">Доставка техники</div>
+      <div class="value">От 3 500 ₽</div>
+    </div>
+  </div>
+</section>
+
+<!-- ADVANTAGES -->
+<section id="advantages">
+  <h2 class="section-title">Почему нас выбирают</h2>
+  <p class="section-subtitle">Качество обслуживания и надёжность — наши главные приоритеты</p>
+  <div class="advantages-grid">
+    <div class="advantage-item">
+      <div class="advantage-icon">🚛</div>
+      <h4>Парк техники</h4>
+      <p>Полный спектр автокранов различной грузоподъёмности для любых задач</p>
+    </div>
+    <div class="advantage-item">
+      <div class="advantage-icon">🛡️</div>
+      <h4>Допуски и сертификаты</h4>
+      <p>Все машины и операторы имеют необходимые лицензии и страховку</p>
+    </div>
+    <div class="advantage-item">
+      <div class="advantage-icon">⏱️</div>
+      <h4>Пунктуальность</h4>
+      <p>Оперативная подача техники в срок, работаем 24/7 по заявкам</p>
+    </div>
+    <div class="advantage-item">
+      <div class="advantage-icon">⚡</div>
+      <h4>Опыт 15+ лет</h4>
+      <p>Выполняем работы на объектах федерального и регионального значения</p>
+    </div>
+  </div>
+</section>
+
+<!-- OBJECTS -->
+<section id="objects">
+  <h2 class="section-title">Наши объекты</h2>
+  <p class="section-subtitle">Примеры успешно выполненных проектов</p>
+  <div class="objects-grid">
+    <div class="object-card">
+      <img src="https://cdn.b12.io/client_media/4LsxPdfZ/fdc13963-1b08-11f1-8d0e-0242ac110002-izgF39Gym92N2DH6G7-hj.jpg" alt="Технопарк">
+      <div class="object-card-body">
+        <h3>Монтаж офисного комплекса "Технопарк"</h3>
+        <p>Подъём и монтаж 150 тонн стальных конструкций и инженерного оборудования на высоте 35 метров.</p>
+        <div class="used-crane-label">Использованный кран</div>
+        <div class="used-crane-value">МКС-160 (160 тонн)</div>
+      </div>
+    </div>
+    <div class="object-card">
+      <img src="https://cdn.b12.io/client_media/4LsxPdfZ/fdd480e9-1b08-11f1-88ab-0242ac110002-GHXTs01j2RPmtGE7kyVEW.jpg" alt="Мостовой переход">
+      <div class="object-card-body">
+        <h3>Строительство мостового перехода</h3>
+        <p>Установка предварительно напряжённых железобетонных балок и монтаж металлических ферм моста.</p>
+        <div class="used-crane-label">Использованный кран</div>
+        <div class="used-crane-value">МКС-100 (100 тонн)</div>
+      </div>
+    </div>
+    <div class="object-card">
+      <img src="https://cdn.b12.io/client_media/4LsxPdfZ/fdc72ef8-1b08-11f1-b598-0242ac110002-fe2MLgq4Ky8_lgMvAn9Yr.jpg" alt="Производственный цех">
+      <div class="object-card-body">
+        <h3>Расширение производственного цеха</h3>
+        <p>Монтаж тяжёлого производственного оборудования весом до 80 тонн и реконструкция кровельных конструкций.</p>
+        <div class="used-crane-label">Использованный кран</div>
+        <div class="used-crane-value">МКС-100 (100 тонн)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTS -->
+<section id="contacts">
+  <h2 class="section-title">Свяжитесь с нами</h2>
+  <p class="section-subtitle">Оставьте заявку и мы свяжемся с вами в течение 24 часов</p>
+  <div class="contacts-inner">
+    <div class="contact-info">
+      <h3>Телефон</h3>
+      <a href="tel:+79999999999">+7 (999) 999-99-99</a>
+
+      <h3>Email</h3>
+      <a href="/cdn-cgi/l/email-protection#5f363139301f3c2d3e313a2c712d2a"><span class="__cf_email__" data-cfemail="036a6d656c436071626d66702d7176">[email&#160;protected]</span></a>
+
+      <h3>Адрес</h3>
+      <p class="addr">г. Москва, ул. Строительная, д. 10</p>
+
+      <h3>Режим работы</h3>
+      <p class="hours">Пн-Пт: 9:00 – 18:00<br>Сб-Вс: 10:00 – 16:00</p>
+      <a href="tel:+79999999999" class="emergency">Экстренный вызов: круглосуточно</a>
+    </div>
+    <div class="contact-form">
+      <div class="form-group">
+        <label class="form-label">Имя <span class="required">*</span></label>
+        <input type="text" placeholder="Ваше полное имя">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Телефон <span class="required">*</span></label>
+        <input type="tel" placeholder="+7 (999) 999-99-99">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Объект / Адрес <span class="required">*</span></label>
+        <input type="text" placeholder="Адрес объекта или название проекта">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Комментарий</label>
+        <textarea placeholder="Дополнительная информация о вашем заказе"></textarea>
+      </div>
+      <button class="btn-primary btn-full" onclick="submitForm()">Отправить заявку</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <h2>Аренда автокранов</h2>
+      <p>Предоставляем надёжный парк автокранов для выполнения любых строительных работ. Оперативная подача техники, квалифицированные операторы, договорное обслуживание.</p>
+    </div>
+    <div class="footer-col">
+      <h3>Контакты</h3>
+      <p><strong>Телефон:</strong>+7 (999) 999-99-99</p>
+      <p><strong>Email:</strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c4adaaa2ab84a7b6a5aaa1b7eab6b1">[email&#160;protected]</a></p>
+      <p><strong>Адрес:</strong>г. Москва, ул. Строительная, д. 10</p>
+      <p><strong>Режим работы:</strong>Пн-Пт: 9:00 – 18:00<br>Сб-Вс: 10:00 – 16:00</p>
+    </div>
+    <div class="footer-col">
+      <h3>Быстрые ссылки</h3>
+      <a href="#park">Парк техники</a>
+      <a href="#pricing">Условия и цены</a>
+      <a href="#advantages">Преимущества</a>
+      <a href="#objects">Наши объекты</a>
+      <a href="#contacts">Контактная форма</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>
+      <span>© 2026 ООО "Аренда автокранов". Все права защищены.</span>
+      <a href="#">Политика конфиденциальности</a>
+    </div>
+    <div class="built-by">Built by <span>B12</span> ❤️</div>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  function submitForm() {
+    alert('Заявка отправлена! Мы свяжемся с вами в течение 24 часов.');
+  }
+
+  function toggleMenu() {
+    const links = document.querySelector('.nav-links');
+    if (links.style.display === 'flex') {
+      links.style.display = 'none';
+    } else {
+      links.style.display = 'flex';
+      links.style.flexDirection = 'column';
+      links.style.position = 'absolute';
+      links.style.top = '70px';
+      links.style.left = '0';
+      links.style.right = '0';
+      links.style.background = '#fff';
+      links.style.padding = '20px 40px';
+      links.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+    }
+  }
+
+  // Smo
